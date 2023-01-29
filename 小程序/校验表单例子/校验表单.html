@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>表单校验</title>
+		<meta charset="UTF-8">
+		<style type="text/css">
+			/*设置背景图片*/
+			body {
+				background-image: url('https://s1.ax1x.com/2023/01/23/pSYGUaR.jpg');
+				background-repeat: no-repeat;
+				background-size: cover;
+			}
+
+			/*设置表格属性*/
+			table {
+				border: solid 1px;
+				border-radius: 15px;
+				margin: 30px auto;
+				padding: 20px;
+			}
+			td{
+				padding-bottom: 8px;
+				padding-right: 0px;
+			}
+			
+			/*设置提示语样式*/
+			span{
+				font-size:10px;
+				align-content: ;
+			}
+		</style>
+
+		<script type="text/javascript">
+			//参数:被检测的标签name值,检测标准正则表达式reg
+			function checked(name, reg) {
+				//获取被检测的标签内容,通过name获取的是一个数组
+				var cheke = document.getElementsByName(name)[0].value;
+				//获取提示标签span
+				var span = document.getElementById(name + "_span");
+
+				//进行处理
+				if (cheke == '' || cheke == null) {
+					span.innerHTML = "请输入";
+					span.style.color = 'red';
+					return false;
+				} else if (reg.test(cheke)) {
+					span.innerHTML = "合理";
+					span.style.color = 'green';
+					return true;
+				} else {
+					span.innerHTML = "输入不合理";
+					span.style.color = 'red';
+					return false;
+				}
+			}
+
+			//用户名校验：字母开头，长度为4-15
+			function checkedUname() {
+				return checked('uname', /^[a-zA-Z][a-zA-Z0-9_]{3,14}$/);
+			}
+			//密码校验：字母开头，长度为6-18
+			function checkedPwd() {
+				return checked('pwd', /^[a-zA-Z]\w{5,17}$/);
+			}
+			//确认密码框校验：必须与上一次输入的密码一致
+			function checkedPwd2() {
+				//检测密码框
+				checkedPwd();
+
+				//获取密码框内容
+				var pwd = document.getElementsByName('pwd')[0].value;
+				//获取确认密码框内容
+				var pwd2 = document.getElementsByName('pwd2')[0].value;
+				//获取提示框
+				var pwd2_span = document.getElementById('pwd2_span');
+
+				//比较内容是否相等
+				if (pwd2 == '' || pwd2 == null) {
+					pwd2_span.innerHTML = "请输入";
+					pwd2_span.style.color = 'red';
+					return false;
+				} else if (pwd == pwd2) {
+					pwd2_span.innerHTML = "合理";
+					pwd2_span.style.color = 'green';
+					return true;
+				} else {
+					pwd2_span.innerHTML = "输入不合理";
+					pwd2_span.style.color = 'red';
+					return false;
+				}
+			}
+			//邮箱校验
+			function checkedEmail() {
+				return checked('uemail', /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/);
+			}
+			//手机号校验:11位，1开头，第二位不能小于3
+			function checkedIpone() {
+				return checked('uphone', /^(1[3-9][0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/);
+			}
+			//爱好校验：必须选中一个爱好
+			function checkedFav() {
+				//获取所有爱好
+				var favs = document.getElementsByName('fav');
+				//获取提示标签
+				var span_fav = document.getElementById('fav_span');
+				//遍历爱好值
+				for (var i = 0; i < favs.length; i++) {
+					//如果有一个选中，则通过
+					if (favs[i].checked == true) {
+						span_fav.innerHTML = "合理";
+						span_fav.style.color = 'green';
+						return true;
+					}
+				}
+				span_fav.innerHTML = "至少选一个";
+				span_fav.style.color = 'red';
+				return false;
+			}
+			//个人介绍校验:内容必须有10个字符
+			function checkedReadme(){
+				return checked('readme', /^.{10,}$/);
+			}
+			//协议校验：不同意则无法进行注册
+			function checkedAgree(){
+				//获取协议单选框的选中状态
+				var agree = document.getElementById('agree_checkbox').checked;
+				//获取注册按钮
+				var submit = document.getElementById('submit_id');
+				//获取提示语
+				var agree_span=document.getElementById('agree_span');
+				//判断是否被勾选
+				if(agree==true){
+					submit.disabled=false;
+					agree_span.innerHTML='';
+					return true;
+				}else{
+					submit.disabled=true;
+					agree_span.innerHTML='请阅读并勾选协议';
+					agree_span.style.color='red';
+					return false;
+				}
+			}
+			
+			
+			//注册校验：所有的表单都符合要求才能进行数据提交
+			function checkedAll(){
+				//执行所有校验
+				checkedAgree();
+				checkedReadme();
+				checkedFav();
+				checkedIpone();
+				checkedEmail();
+				checkedPwd2();
+				checkedPwd();
+				checkedUname();
+				
+				//是否所有的表单都符合要求
+				var isPass = checkedAgree()&&checkedReadme()&&checkedFav()&&checkedIpone()&&checkedEmail()&&checkedPwd2()&&checkedPwd()&&checkedUname();
+				return isPass;
+			}
+			
+			
+			
+			
+		</script>
+
+	</head>
+	<body >
+		<form action="#" method="get" onsubmit="return checkedAll()">
+			<table>
+				<tr>
+					<td width="80px">用户名：</td>
+					<td width="200px">
+						<input type="text" name="uname" width="200px" onblur="checkedUname()">
+					</td>
+					<td width="110px">
+						<span width="80px" id="uname_span">字母开头（4-15）</span>
+					</td>
+
+				</tr>
+				<tr>
+					<td>密码：</td>
+					<td>
+						<input type="password" name="pwd" onblur="checkedPwd()">
+					</td>
+					<td>
+						<span width="80px" id="pwd_span">字母开头（6-18）</span>
+					</td>
+				</tr>
+				<tr>
+					<td>确认密码：</td>
+					<td>
+						<input type="password" name="pwd2" onblur="checkedPwd2()">
+					</td>
+					<td>
+						<span width="80px" id="pwd2_span"></span>
+					</td>
+				</tr>
+				<tr>
+					<td>邮箱：</td>
+					<td>
+						<input type=" text" name="uemail" onblur="checkedEmail()">
+					</td>
+					<td>
+						<span width="80px" id="uemail_span""></span>
+					</td>
+				</tr>
+				<tr>
+					<td>手机号码：</td>
+					<td>
+						<input type=" text" name="uphone" onblur="checkedIpone()">
+					</td>
+					<td>
+						<span width="80px" id="uphone_span""></span>
+					</td>
+				</tr>
+				<tr>
+					<td>性别：</td>
+					<td>
+						男<input type="radio" name="sex" value="1" checked="checked">
+						女<input type="radio" name="sex" value="0">
+					</td>
+				</tr>
+				<tr>
+					<td>爱好：</td>
+					<td>
+						<input type="checkbox" name="fav" value="1" onblur="checkedFav()">唱
+						<input type="checkbox" name="fav" value="2" onblur="checkedFav()">跳
+						<input type="checkbox" name="fav" value="3" onblur="checkedFav()">rap
+					</td>
+					<td>
+						<span width="80px" id="fav_span"">至少选择一项</span>
+					</td>
+				</tr>
+				<tr>
+					<td>籍贯：</td>
+					<td>
+						<select name=" origin">
+							<option value="1">小鸡岛</option>
+							<option value="2">蚌埠</option>
+							<option value="3">芜湖</option>
+							<option value="4">曹县</option>
+							</select>
+					</td>
+				</tr>
+				<tr>
+					<td>个人介绍：</td>
+					<td>
+						<textarea name="readme" cols="28" rows="10" onblur="checkedReadme()"></textarea>
+					</td>
+					<td>
+						<span width="80px" id="readme_span">不少于10个字符</span>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2" align="center">
+							<input type="checkbox" id='agree_checkbox' onchange="checkedAgree()">是否同意<a href="">《用户协议》</a>
+					</td>
+					<td>
+						<span width="80px" id="agree_span">请仔细阅读</span>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="3" align="center" >
+						<input type="submit" value="注册" id="submit_id" disabled='true' >
+					</td>
+				</tr>
+			</table>
+		</form>
+	</body>
+</html>

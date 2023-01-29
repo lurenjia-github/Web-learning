@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>操作表格</title>
+		<!--样式-->
+		<style type="text/css">
+			table {
+				margin: 20px auto;
+				width: 650px;
+			}
+
+			tr {
+				height: 30px;
+				text-align: center;
+			}
+		</style>
+		<!--js代码域-->
+		<script type="text/javascript">
+			//反选按钮
+			function chooseAll() {
+				//获取表格对象
+				var tab = document.getElementById('tab');
+				//获取第一行
+				var tr1 = tab.rows[0];
+				//获取第一列
+				var td1 = tr1.cells[0];
+				//获取反选按钮
+				var button = td1.childNodes[0];
+				//遍历所有选择框
+				for (var i = 1; i < tab.rows.length; i++) {
+					//获取选择框
+					var temp=tab.rows[i].cells[0].childNodes[0];
+					//如果被选中
+					if (temp.checked) {
+						temp.checked = false;
+					} else {
+						//没有被选中
+						temp.checked = true;
+					}
+				}
+
+			}
+
+			//删除选中行
+			function delChoose(){
+				//
+				var table = document.getElementById('tab');
+				//获取所有的选择框
+				var checkboxs = document.getElementsByName("choose");
+				//查看状态
+				for(var i=0;i<checkboxs.length;i++){
+					if(checkboxs[i].checked){
+						table.deleteRow(checkboxs[i].parentNode.parentNode.rowIndex);
+						//删除一个后length会-1，为保证正确性，i也需要-1.
+						i--;
+					}
+				}
+			}
+
+			//通过按钮删除行
+			function delRow(btn) {
+				//获取table元素
+				var tab = document.getElementById("tab")
+				//获取要删除的行对象
+				var tr = btn.parentNode.parentNode;
+				//删除行
+				tab.deleteRow(tr.rowIndex);
+			}
+
+			//修改列内容：数量
+			function updateRow(btn) {
+				//获取单元格所在行对象
+				var tr = btn.parentNode.parentNode;
+				//获取单元格对象
+				var td = tr.cells[5];
+				//判断是否为数字
+				if (!isNaN(td.innerHTML)) {
+					//修改内容
+					td.innerHTML = "<input type='text' style='width: 40px' value='" + td.innerHTML +
+						"' onblur='updateRow2(this)'>";
+				}
+			}
+			function updateRow2(inp) {
+				//获取单元格对象
+				var td = inp.parentNode;
+				//修改内容
+				if (isNaN(inp.value)) {
+					inp.value = "值错误";
+					inp.style.backgroundColor = 'aquamarine';
+				} else {
+					td.innerHTML = inp.value;
+				}
+			}
+			
+			//新增行
+			function addRow(){
+				//获取表格
+				var table = document.getElementById('tab');
+				//添加行
+				var new_tr = table.insertRow(1);
+				//添加单元格
+				var cell0 = new_tr.insertCell(0);
+				var cell1 = new_tr.insertCell(1);
+				var cell2 = new_tr.insertCell(2);
+				var cell3 = new_tr.insertCell(3);
+				var cell4 = new_tr.insertCell(4);
+				var cell5 = new_tr.insertCell(5);
+				var cell6 = new_tr.insertCell(6);
+				
+				//填入内容
+				cell0.innerHTML="<td><input type='checkbox' name='choose'></td>";
+				
+				cell1.innerHTML="<input style='width: 150px' type='text' onblur='addRow2(this,1)'>";
+				cell2.innerHTML="<input style='width: 50px' type='text' onblur='addRow2(this,2)'>";
+				cell3.innerHTML="<input style='width: 150px' type='text' onblur='addRow2(this,3)'>";
+				cell4.innerHTML="<input style='width: 50px' type='text' onblur='addRow2(this,4)'>";
+				cell5.innerHTML="<input style='width: 50px' type='text' onblur='addRow2(this,5)'>";
+				cell6.innerHTML="<div style='width: 150px'><input type='button' value='修改数量' onclick='updateRow(this)'>&nbsp;<input type='button' value='删除' onclick='delRow(this)'></div>";
+			}
+			
+			function addRow2(inp,index){
+				//获取单元格对象
+				var td=inp.parentNode;
+				//判断数量和价格是否合法
+				if(index==4||index==5){
+					if(isNaN(inp.value)){
+						inp.value = "值错误";
+						inp.style.backgroundColor = 'aquamarine';
+					}else{
+						td.innerHTML=inp.value;
+					}
+				}else{
+					td.innerHTML=inp.value;
+				}
+			}
+			
+			//新增行：使用选中行
+			function copyRows(){
+				//获取table对象
+				var table=document.getElementById('tab');
+				//获取所有的选择框
+				var checkboxs = document.getElementsByName("choose");
+				
+				//遍历选则框
+				for(var i=0;i<checkboxs.length;i++){
+					
+					//框是否被选中
+					if(checkboxs[i].checked){
+						//获取被选中的行
+						var old_tr = table.rows[i+1];
+						//在尾部位置插入新行
+						var new_tr = table.insertRow(table.rows.length);
+						new_tr.innerHTML = old_tr.innerHTML;
+						
+						//如果是在头部插入，则需要添加这句代码，可避免进入死循环，为什么？
+						//old_tr.innerHTML = old_tr.innerHTML;
+					}
+					
+				}
+			}
+			
+			//设置表格隔行变色
+			function operCss(){
+				//获取所有行
+				var rows = document.getElementById('tab').rows;
+				//隔行设置属性
+				for(var i=1;i<rows.length;i++){
+					if(i%2==0){
+						rows[i].style.backgroundColor="red";
+					}else{
+						rows[i].style.backgroundColor="green";
+					}
+					
+				}
+			}
+		</script>
+	</head>
+	<body>
+		<div style="width: 300px; margin: 10px auto;">
+			<button onclick="delChoose()">删除选中</button>
+			<button onclick="addRow()">新增行</button>
+			<button onclick="copyRows()">复制所选</button>
+			<button onclick="operCss()">隔行变色</button>
+		</div>
+		
+		<table id='tab' border="1px">
+			<tr style="text-align: center;font-weight: bold;">
+				<td><input type="button" onclick="chooseAll()" value="反选"></td>
+				<td width=150px>书名</td>
+				<td width=50px>作者</td>
+				<td width=150px>描述</td>
+				<td width=50px>价格</td>
+				<td width=50px>数量</td>
+				<td width=150px>管理</td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" name="choose"></td>
+				<td>《平凡的世界(1)》</td>
+				<td>路遥</td>
+				<td>好看的嘞！</td>
+				<td>9.9</td>
+				<td>3</td>
+				<td><input type="button" value="修改数量" onclick="updateRow(this)">&nbsp;<input type="button" value="删除" onclick="delRow(this)"></td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" name="choose"></td>
+				<td>《平凡的世界(2)》</td>
+				<td>路遥</td>
+				<td>好看的嘞！</td>
+				<td>19.9</td>
+				<td>1</td>
+				<td><input type="button" value="修改数量" onclick="updateRow(this)">&nbsp;<input type="button" value="删除" onclick="delRow(this)"></td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" name="choose"></td>
+				<td>《平凡的世界(3)》</td>
+				<td>路遥</td>
+				<td>好看的嘞！</td>
+				<td>29.9</td>
+				<td>6</td>
+				<td><input type="button" value="修改数量" onclick="updateRow(this)">&nbsp;<input type="button" value="删除" onclick="delRow(this)"></td>
+			</tr>
+		</table>
+	</body>
+</html>
